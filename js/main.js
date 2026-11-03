@@ -346,7 +346,8 @@ const CONFIG = {
     bgEls.forEach((el) => el && el.setAttribute('inert', ''));
     document.body.style.overflow = 'hidden';
     startTimer();
-    popup.focus();
+    overlay.scrollTop = 0;
+    popup.focus({ preventScroll: true });
   }
 
   function closePopup() {
