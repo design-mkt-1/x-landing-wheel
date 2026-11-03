@@ -160,7 +160,6 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
     { id: 'xbet150',  name: '1xBet 150%',  center: 270, weight: 5 }
   ];
   const HALF = 45;         // each sector is 90°
-  const EDGE_MARGIN = 12;  // keep the pointer this far (deg) from sector edges
 
   function pickSector(rand = Math.random) {
     const total = SECTORS.reduce((a, s) => a + s.weight, 0);
@@ -178,11 +177,12 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
     });
   }
 
-  function targetAngle(current, sector, turns, rand = Math.random) {
-    const span = HALF - EDGE_MARGIN;
-    const offset = (rand() * 2 - 1) * span;
+  // Rotation (mod 360) that puts the sector's exact centre under the pointer.
+  const centeredAngle = (sector) => (360 - sector.center) % 360;
+
+  function targetAngle(current, sector, turns) {
     const base = current - (((current % 360) + 360) % 360);          // floor to full turn
-    return base + turns * 360 + ((360 - sector.center) % 360) + offset;
+    return base + turns * 360 + centeredAngle(sector);
   }
 
   /* ------------------------------------------------------------------ */
@@ -416,9 +416,20 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
   setMuted(muted);
   syncBtn();
 
+  // ?reset=1 (testing): clear only the stored spin, then drop the param so a refresh doesn't reset again.
+  const qs = new URLSearchParams(location.search);
+  if (qs.has('reset')) {
+    store.del(KEY_SPIN);
+    qs.delete('reset');
+    const q = qs.toString();
+    try { history.replaceState(null, '', location.pathname + (q ? '?' + q : '') + location.hash); } catch (e) { /* ignore */ }
+  }
+
   const saved = (() => { try { return JSON.parse(store.get(KEY_SPIN) || 'null'); } catch (e) { return null; } })();
-  if (saved && typeof saved.angle === 'number') {
-    setRotation(saved.angle);
+  if (saved && (typeof saved.angle === 'number' || saved.sector)) {
+    // snap to the stored sector's exact centre (old spins may hold an off-centre angle)
+    const sec = SECTORS.find((s) => s.id === saved.sector);
+    setRotation(sec ? centeredAngle(sec) : (saved.angle || 0));
     spinBtn.disabled = true;
     openPopup();
   }
