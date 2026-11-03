@@ -367,3 +367,24 @@ html[lang="ru"] .spin__label { letter-spacing: 1px; }
   .timer__label { white-space: normal; text-align: left; max-width: 120px; }
   html[lang="ru"] .popup__title { font-size: 18px; letter-spacing: -0.2px; }
 }
+
+/* ---------- Popup on phone landscape: whole popup fits the short viewport, no scroll ---------- */
+@media (orientation: landscape) and (max-height: 500px) {
+  .overlay { padding: 10px calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left)); }
+  .popup { gap: 6px; padding: 14px 20px 16px; }
+  .popup__title { font-size: 18px; }
+  .popup__prize { gap: 6px; }
+  .popup__offer { gap: 2px; }
+  .popup__prefix { font-size: 14px; letter-spacing: .8px; }
+  .popup__big {
+    font-size: 70px;
+    font-size: clamp(52px, 21dvh, 76px);
+    filter: drop-shadow(0 0 8px rgba(26,140,255,.75));
+  }
+  .popup__sub { font-size: 17px; }
+  .timer { padding: 2px 0; gap: 12px; }
+  .timer__label { font-size: 13px; }
+  .timer__unit b { font-size: 22px; }
+  .timer__unit span { font-size: 13px; }
+  .popup__btn { padding: 10px 16px; }
+}
