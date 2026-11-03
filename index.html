@@ -6,7 +6,7 @@
   <title>Până la 200% bonus + 300 rotiri gratis</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,800;0,900;1,800;1,900&family=Open+Sans:wght@400&family=Rubik:wght@400&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,800;0,900;1,800;1,900&family=Rubik:wght@400&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -73,8 +73,8 @@
               <span class="lbl__fs">+ 150 FS</span>
             </div>
             <div class="lbl lbl--7777">
-              <span class="lbl__brand">7777</span>
-              <span class="lbl__pct">200%</span>
+              <span class="lbl__logo7777"><img src="assets/logo-7777.svg" alt="Loteria Naţională 7777.md" width="110" height="62"></span>
+              <span class="lbl__pct">175%</span>
               <span class="lbl__fs">+ 200 FS</span>
             </div>
             <div class="lbl lbl--side lbl--left">
@@ -124,8 +124,8 @@
         <span class="popup__line" aria-hidden="true"></span>
         <div class="popup__offer">
           <p class="popup__prefix" data-i18n="popPrefix">Până la</p>
-          <p class="popup__big">200%</p>
-          <p class="popup__sub" data-i18n="popSub">bonus + 300 Rotiri Gratis</p>
+          <p class="popup__big" id="popBig">200%</p>
+          <p class="popup__sub" id="popSub">bonus + 300 Rotiri Gratis</p>
         </div>
         <span class="popup__line" aria-hidden="true"></span>
       </div>
@@ -139,12 +139,9 @@
           <i class="timer__sep" aria-hidden="true"></i>
         </span>
       </div>
-      <form class="email" id="emailForm" novalidate>
-        <label class="visually-hidden" for="email" data-i18n="emailLabel">Adresa de email</label>
-        <input class="email__input" id="email" name="email" type="email" inputmode="email" autocomplete="email" data-i18n-ph="emailPh" placeholder="Email" aria-describedby="emailErr" required>
-        <button type="submit" class="btn-blue email__btn" id="submitBtn"><span class="cta-full" data-i18n="cta">Vreau Rotirile</span><span class="cta-short" data-i18n="ctaShort">Vreau Rotirile</span></button>
-      </form>
-      <p class="email__err" id="emailErr" role="alert" hidden></p>
+      <div class="popup__cta">
+        <button type="button" class="btn-blue popup__btn" id="submitBtn"><span class="cta-full" data-i18n="cta">Vreau Rotirile</span><span class="cta-short" data-i18n="ctaShort">Vreau Rotirile</span></button>
+      </div>
     </div>
   </div>
 

@@ -1,6 +1,12 @@
-/* PLACEHOLDER: replace registerUrl with the real registration URL before going live.
-   The visitor's email is appended as ?<emailParam>=<email>. */
-const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email' };
+/* Redirect link per wheel sector (keyed by sector id). click_id is fixed. */
+const CONFIG = {
+  links: {
+    slot200: 'https://moldspot.site/?click_id=btag2059_dass_ggds_dsaa',
+    s7777:   'https://7777.md/?click_id=btag2059_dass_ggds_dsaa',
+    xbet150: 'https://1xbet.com/?click_id=btag2059_dass_ggds_dsaa',
+    xbet120: 'https://1xbet.com/?click_id=btag2059_dass_ggds_dsaa'
+  }
+};
 
 (function () {
   'use strict';
@@ -17,15 +23,11 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
       spin: 'SPIN',
       popTitle: 'Felicitări! Ai câștigat',
       popPrefix: 'Până la',
-      popSub: 'bonus + 300 Rotiri Gratis',
       expires: 'Oferta expiră în:',
       min: 'min',
       sec: 'sec',
-      emailLabel: 'Adresa de email',
-      emailPh: 'Email',
       cta: 'Vreau Rotirile',
       ctaShort: 'Vreau Rotirile',
-      emailErr: 'Introdu o adresă de email validă (ex.: nume@exemplu.ro).',
       close: 'Închide',
       mute: 'Oprește sunetul',
       langGroup: 'Limba'
@@ -38,15 +40,11 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
       spin: 'Крутить',
       popTitle: 'Поздравляем, вы выиграли',
       popPrefix: 'Бонус до',
-      popSub: '+ 300 фриспинов',
       expires: 'Предложение истекает через:',
       min: 'мин',
       sec: 'сек',
-      emailLabel: 'Адрес электронной почты',
-      emailPh: 'Эл. Почта',
       cta: 'Забрать Фриспины',
       ctaShort: 'Забрать ФС',
-      emailErr: 'Введите корректный адрес эл. почты (напр.: name@example.com).',
       close: 'Закрыть',
       mute: 'Выключить звук',
       langGroup: 'Язык'
@@ -81,10 +79,24 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
     root.lang = l;
     document.title = t.title;
     document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t[el.dataset.i18n]; });
-    document.querySelectorAll('[data-i18n-ph]').forEach((el) => { el.placeholder = t[el.dataset.i18nPh]; });
     document.querySelectorAll('[data-i18n-aria]').forEach((el) => { el.setAttribute('aria-label', t[el.dataset.i18nAria]); });
     document.querySelectorAll('.lang-btn').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === l)));
-    if (!errEl.hidden) errEl.textContent = t.emailErr;
+    renderPrize();
+  }
+
+  // Popup prize text for the sector the wheel landed on.
+  function renderPrize() {
+    const sec = currentSector || SECTORS[0];
+    $('popBig').textContent = sec.pct;
+    $('popSub').textContent = sec.sub[lang];
+  }
+
+  // Same-tab redirect to the landed sector's link. xlwOnNavigate lets tests capture the URL.
+  function goToSector() {
+    const sec = currentSector || SECTORS[0];
+    const url = CONFIG.links[sec.id];
+    if (typeof window.xlwOnNavigate === 'function') { window.xlwOnNavigate(url); return; }
+    window.location.href = url;
   }
 
   /* ------------------------------------------------------------------ */
@@ -154,11 +166,17 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
   /* Sector centres, clockwise from the pointer (top) at rotation 0.     */
   /* ------------------------------------------------------------------ */
   const SECTORS = [
-    { id: 'slot200',  name: 'SLOT 200%',   center: 0,   weight: 80 },
-    { id: 'xbet120',  name: '1xBet 120%',  center: 90,  weight: 5 },
-    { id: 's7777',    name: '7777 200%',   center: 180, weight: 10 },
-    { id: 'xbet150',  name: '1xBet 150%',  center: 270, weight: 5 }
+    { id: 'slot200',  name: 'SLOT 200%',   center: 0,   weight: 80, pct: '200%',
+      sub: { ro: 'bonus + 300 Rotiri Gratis', ru: '+ 300 фриспинов' } },
+    { id: 'xbet120',  name: '1xBet 120%',  center: 90,  weight: 5,  pct: '120%',
+      sub: { ro: 'bonus + 150 Rotiri Gratis', ru: '+ 150 фриспинов' } },
+    { id: 's7777',    name: '7777 175%',   center: 180, weight: 10, pct: '175%',
+      sub: { ro: 'bonus + 200 Rotiri Gratis', ru: '+ 200 фриспинов' } },
+    { id: 'xbet150',  name: '1xBet 150%',  center: 270, weight: 5,  pct: '150%',
+      sub: { ro: 'bonus + 200 Rotiri Gratis', ru: '+ 200 фриспинов' } }
   ];
+  let currentSector = null;   // sector the wheel landed on (set after spin / restored on reload)
+  let forcedId = null;        // test hook: xlwForce(id) makes the next spin land on that sector
   const HALF = 45;         // each sector is 90°
 
   function pickSector(rand = Math.random) {
@@ -278,7 +296,7 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
     spinBtn.disabled = true;
     wheelEl.classList.add('is-spinning');
 
-    const sector = pickSector();
+    const sector = (forcedId && SECTORS.find((s) => s.id === forcedId)) || pickSector();
     const turns = reducedMotion ? 1 : 6;
     const dur = reducedMotion ? 1200 : 5200;
     const from = rotation, to = targetAngle(from, sector, turns);
@@ -302,6 +320,8 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
     wheelEl.classList.remove('is-spinning');
     const landed = sectorAt(finalDeg);
     store.set(KEY_SPIN, JSON.stringify({ sector: sector.id, landed: landed && landed.id, angle: finalDeg % 360, ts: Date.now() }));
+    currentSector = landed || sector;
+    renderPrize();
     playWin();
     if (!reducedMotion) confetti();
     setTimeout(openPopup, 800);
@@ -315,7 +335,7 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
   let lastFocus = null;
 
   function focusables() {
-    return Array.from(popup.querySelectorAll('button, input, [href], [tabindex]:not([tabindex="-1"])'))
+    return Array.from(popup.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])'))
       .filter((el) => !el.disabled && el.offsetParent !== null);
   }
 
@@ -362,35 +382,6 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
   }
 
   /* ------------------------------------------------------------------ */
-  /* Email                                                               */
-  /* ------------------------------------------------------------------ */
-  const form = $('emailForm'), input = $('email'), submitBtn = $('submitBtn'), errEl = $('emailErr');
-  const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[A-Za-z]{2,}$/;
-  const isValid = (v) => EMAIL_RE.test(v.trim());
-  let triedSubmit = false;
-
-  function showErr(show) {
-    errEl.hidden = !show;
-    errEl.textContent = show ? I18N[lang].emailErr : '';
-    form.classList.toggle('is-invalid', show);
-    input.setAttribute('aria-invalid', String(show));
-  }
-  function syncBtn() {
-    const ok = isValid(input.value);
-    if (ok) showErr(false);
-    else if (triedSubmit) showErr(true);
-  }
-  input.addEventListener('input', syncBtn);
-  input.addEventListener('blur', () => { if (input.value.trim() && !isValid(input.value)) showErr(true); });
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (!isValid(input.value)) { triedSubmit = true; showErr(true); input.focus(); return; }
-    const url = new URL(CONFIG.registerUrl, location.href);
-    url.searchParams.set(CONFIG.emailParam, input.value.trim());
-    location.href = url.toString();
-  });
-
-  /* ------------------------------------------------------------------ */
   /* Wiring                                                              */
   /* ------------------------------------------------------------------ */
   function setMuted(m) {
@@ -406,7 +397,8 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
   $('muteBtn').addEventListener('click', () => setMuted(!muted));
   spinBtn.addEventListener('click', spin);
   $('closeBtn').addEventListener('click', closePopup);
-  $('stickyBtn').addEventListener('click', openPopup);
+  $('stickyBtn').addEventListener('click', goToSector);
+  $('submitBtn').addEventListener('click', goToSector);
   window.addEventListener('resize', fit);
 
   // init
@@ -414,7 +406,6 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
   buildBulbs();
   applyLang(lang);
   setMuted(muted);
-  syncBtn();
 
   // ?reset=1 (testing): clear only the stored spin, then drop the param so a refresh doesn't reset again.
   const qs = new URLSearchParams(location.search);
@@ -430,6 +421,8 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
     // snap to the stored sector's exact centre (old spins may hold an off-centre angle)
     const sec = SECTORS.find((s) => s.id === saved.sector);
     setRotation(sec ? centeredAngle(sec) : (saved.angle || 0));
+    currentSector = sec || SECTORS[0];
+    renderPrize();
     spinBtn.disabled = true;
     openPopup();
   }
@@ -451,5 +444,6 @@ const CONFIG = { registerUrl: 'https://example.com/register', emailParam: 'email
     Object.keys(counts).forEach((k) => { pct[k] = +(counts[k] * 100 / n).toFixed(2); });
     return { n, percent: pct, pointerMismatches: mismatches };
   };
+  window.xlwForce = function (id) { forcedId = id; };
   window.xlwReset = function () { store.del(KEY_SPIN); location.reload(); };
 })();
