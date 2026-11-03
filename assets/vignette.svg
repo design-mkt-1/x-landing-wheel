@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="453" height="453" viewBox="0 0 453 453" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle id="Vignette" cx="226.5" cy="226.5" r="226.5" fill="url(#paint0_radial_0_55)"/>
+<defs>
+<radialGradient id="paint0_radial_0_55" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(226.5 226.5) scale(226.5)">
+<stop stop-opacity="0"/>
+<stop offset="0.72" stop-opacity="0"/>
+<stop offset="1" stop-opacity="0.45"/>
+</radialGradient>
+</defs>
+</svg>

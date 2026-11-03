@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="320.319" height="226.5" viewBox="0 0 320.319 226.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path id="Segment &#194;&#183; SlotMD &#194;&#183; 200% + 300 RG" d="M0 66.3403C42.477 23.8633 100.088 6.44474e-06 160.16 0C220.231 -6.44474e-06 277.842 23.8633 320.319 66.3403L160.16 226.5L0 66.3403Z" fill="url(#paint0_radial_0_60)"/>
+<defs>
+<radialGradient id="paint0_radial_0_60" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160.16 226.5) scale(226.5)">
+<stop stop-color="#36BCFF"/>
+<stop offset="0.65" stop-color="#0B6BDB"/>
+<stop offset="1" stop-color="#004FCC"/>
+</radialGradient>
+</defs>
+</svg>
